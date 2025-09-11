@@ -1,0 +1,8 @@
+<Solution>
+    <Project Path="collections/source/Collections.csproj" />
+    <Project Path="source/DotNetFiles.csproj" />
+    <Project Path="tests/DotNetFiles.Tests.csproj" />
+    <Project Path="unmanaged/core/Unmanaged.Core.csproj" />
+    <Project Path="unmanaged/source/Unmanaged.csproj" />
+    <Project Path="xml/source/XML.csproj" />
+</Solution>

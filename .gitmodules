@@ -1,0 +1,9 @@
+[submodule "xml"]
+	path = xml
+	url = https://github.com/simulation-tree/xml
+[submodule "collections"]
+	path = collections
+	url = https://github.com/simulation-tree/collections
+[submodule "unmanaged"]
+	path = unmanaged
+	url = https://github.com/simulation-tree/unmanaged
