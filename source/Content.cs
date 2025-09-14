@@ -31,7 +31,7 @@ public readonly struct Content
 
             return default;
         }
-        set => node.SetAttribute(nameof(PackagePath), value);
+        set => node.SetOrAddAttribute(nameof(PackagePath), value);
     }
 
     public readonly bool? Visible

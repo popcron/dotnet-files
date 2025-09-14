@@ -25,7 +25,7 @@ internal static class XMLNodeExtensions
         }
         else
         {
-            node.SetAttribute(IncludeAttribute, include);
+            node.SetOrAddAttribute(IncludeAttribute, include);
         }
     }
 
@@ -39,7 +39,7 @@ internal static class XMLNodeExtensions
         }
 
         // then child node
-        if (node.TryGetFirst(name, out XMLNode childNode))
+        if (node.TryGetFirstChild(name, out XMLNode childNode))
         {
             found = childNode.Content.AsSpan();
             return true;
@@ -76,7 +76,7 @@ internal static class XMLNodeExtensions
         {
             if (value is bool nonNullValue)
             {
-                node.SetAttribute(name, nonNullValue ? "true" : "false");
+                node.SetOrAddAttribute(name, nonNullValue ? "true" : "false");
             }
             else
             {
@@ -85,7 +85,7 @@ internal static class XMLNodeExtensions
         }
         else
         {
-            if (node.TryGetFirst(name, out XMLNode childNode))
+            if (node.TryGetFirstChild(name, out XMLNode childNode))
             {
                 if (value is bool notNullValue)
                 {
@@ -93,7 +93,7 @@ internal static class XMLNodeExtensions
                 }
                 else
                 {
-                    node.TryRemove(childNode);
+                    node.TryRemoveChild(childNode);
                 }
             }
             else
@@ -101,7 +101,7 @@ internal static class XMLNodeExtensions
                 if (value is bool notNullValue)
                 {
                     // prefer attribute
-                    node.SetAttribute(name, notNullValue ? "true" : "false");
+                    node.SetOrAddAttribute(name, notNullValue ? "true" : "false");
                 }
             }
         }
@@ -131,7 +131,7 @@ internal static class XMLNodeExtensions
         {
             if (value is T notNullValue)
             {
-                node.SetAttribute(name, notNullValue.ToString());
+                node.SetOrAddAttribute(name, notNullValue.ToString());
             }
             else
             {
@@ -140,7 +140,7 @@ internal static class XMLNodeExtensions
         }
         else
         {
-            if (node.TryGetFirst(name, out XMLNode childNode))
+            if (node.TryGetFirstChild(name, out XMLNode childNode))
             {
                 if (value is T notNullValue)
                 {
@@ -148,7 +148,7 @@ internal static class XMLNodeExtensions
                 }
                 else
                 {
-                    node.TryRemove(childNode);
+                    node.TryRemoveChild(childNode);
                 }
             }
             else
@@ -156,7 +156,7 @@ internal static class XMLNodeExtensions
                 if (value is T notNullValue)
                 {
                     // prefer attribute
-                    node.SetAttribute(name, notNullValue.ToString());
+                    node.SetOrAddAttribute(name, notNullValue.ToString());
                 }
             }
         }

@@ -68,7 +68,7 @@ public struct Project : IDisposable, ISerializable
                 if (value is LangVersion nonNullValue)
                 {
                     XMLNode propertyGroup = GetPropertyGroup(condition);
-                    propertyGroup.Add(new XMLNode(nameof(LangVersion), nonNullValue.ToString()));
+                    propertyGroup.AddChild(new XMLNode(nameof(LangVersion), nonNullValue.ToString()));
                 }
             }
         }
@@ -103,11 +103,14 @@ public struct Project : IDisposable, ISerializable
                 if (value is bool nonNullValue)
                 {
                     XMLNode propertyGroup = GetPropertyGroup(default);
-                    propertyGroup.Add(new XMLNode(nameof(IsTestProject), nonNullValue ? "True" : "False"));
+                    propertyGroup.AddChild(new XMLNode(nameof(IsTestProject), nonNullValue ? "True" : "False"));
                 }
             }
         }
     }
+
+    [Obsolete("Default constructor not supported", true)]
+    public Project() { }
 
     public Project(ReadOnlySpan<byte> xmlBytes)
     {
@@ -183,31 +186,31 @@ public struct Project : IDisposable, ISerializable
         if (targetFrameworks.Count == 0)
         {
             // remove both TargetFramework and TargetFrameworks if exist
-            if (propertyGroup.TryGetFirst("TargetFramework", out XMLNode single))
+            if (propertyGroup.TryGetFirstChild("TargetFramework", out XMLNode single))
             {
-                propertyGroup.TryRemove(single);
+                propertyGroup.TryRemoveChild(single);
             }
-            else if (propertyGroup.TryGetFirst("TargetFrameworks", out XMLNode multiple))
+            else if (propertyGroup.TryGetFirstChild("TargetFrameworks", out XMLNode multiple))
             {
-                propertyGroup.TryRemove(multiple);
+                propertyGroup.TryRemoveChild(multiple);
             }
         }
         else if (targetFrameworks.Count == 1)
         {
             // just one tfm
-            if (propertyGroup.TryGetFirst("TargetFramework", out XMLNode single))
+            if (propertyGroup.TryGetFirstChild("TargetFramework", out XMLNode single))
             {
                 single.Content.CopyFrom(targetFrameworks[0].ToString());
             }
             else
             {
                 // replace TargetFrameworks if exist
-                if (propertyGroup.TryGetFirst("TargetFrameworks", out XMLNode multi))
+                if (propertyGroup.TryGetFirstChild("TargetFrameworks", out XMLNode multi))
                 {
-                    propertyGroup.TryRemove(multi);
+                    propertyGroup.TryRemoveChild(multi);
                 }
 
-                propertyGroup.Add(new XMLNode("TargetFramework", targetFrameworks[0].ToString()));
+                propertyGroup.AddChild(new XMLNode("TargetFramework", targetFrameworks[0].ToString()));
             }
         }
         else
@@ -224,18 +227,14 @@ public struct Project : IDisposable, ISerializable
                 value.Append(targetFrameworks[i].ToString());
             }
 
-            if (propertyGroup.TryGetFirst("TargetFrameworks", out XMLNode multi))
+            if (propertyGroup.TryGetFirstChild("TargetFrameworks", out XMLNode multi))
             {
                 multi.Content.CopyFrom(value.AsSpan());
             }
             else
             {
-                if (propertyGroup.TryGetFirst("TargetFramework", out XMLNode single))
-                {
-                    propertyGroup.TryRemove(single);
-                }
-
-                propertyGroup.Add(new XMLNode("TargetFrameworks", value.AsSpan()));
+                propertyGroup.TryRemoveChild("TargetFramework");
+                propertyGroup.AddChild(new XMLNode("TargetFrameworks", value.AsSpan()));
             }
         }
     }
@@ -371,13 +370,13 @@ public struct Project : IDisposable, ISerializable
 
         if (TryGetItemGroupWith(nameof(EmbeddedResource), out XMLNode itemGroupNode))
         {
-            itemGroupNode.Add(newNode);
+            itemGroupNode.AddChild(newNode);
         }
         else
         {
             XMLNode newItemGroup = new("ItemGroup");
-            newItemGroup.Add(newNode);
-            rootNode.Add(newItemGroup);
+            newItemGroup.AddChild(newNode);
+            rootNode.AddChild(newItemGroup);
         }
     }
 
@@ -407,13 +406,13 @@ public struct Project : IDisposable, ISerializable
 
         if (TryGetItemGroupWith(nameof(ProjectReference), out XMLNode itemGroupNode))
         {
-            itemGroupNode.Add(newNode);
+            itemGroupNode.AddChild(newNode);
         }
         else
         {
             XMLNode newItemGroup = new("ItemGroup");
-            newItemGroup.Add(newNode);
-            rootNode.Add(newItemGroup);
+            newItemGroup.AddChild(newNode);
+            rootNode.AddChild(newItemGroup);
         }
     }
 
@@ -444,13 +443,13 @@ public struct Project : IDisposable, ISerializable
 
         if (TryGetItemGroupWith(nameof(PackageReference), out XMLNode itemGroupNode))
         {
-            itemGroupNode.Add(newNode);
+            itemGroupNode.AddChild(newNode);
         }
         else
         {
             XMLNode newItemGroup = new("ItemGroup");
-            newItemGroup.Add(newNode);
-            rootNode.Add(newItemGroup);
+            newItemGroup.AddChild(newNode);
+            rootNode.AddChild(newItemGroup);
         }
     }
 
@@ -480,13 +479,13 @@ public struct Project : IDisposable, ISerializable
 
         if (TryGetItemGroupWith(nameof(Analyzer), out XMLNode itemGroupNode))
         {
-            itemGroupNode.Add(newNode);
+            itemGroupNode.AddChild(newNode);
         }
         else
         {
             XMLNode newItemGroup = new("ItemGroup");
-            newItemGroup.Add(newNode);
-            rootNode.Add(newItemGroup);
+            newItemGroup.AddChild(newNode);
+            rootNode.AddChild(newItemGroup);
         }
     }
 
@@ -519,13 +518,13 @@ public struct Project : IDisposable, ISerializable
 
         if (TryGetItemGroupWith(nameof(Content), out XMLNode itemGroupNode))
         {
-            itemGroupNode.Add(newNode);
+            itemGroupNode.AddChild(newNode);
         }
         else
         {
             XMLNode newItemGroup = new("ItemGroup");
-            newItemGroup.Add(newNode);
-            rootNode.Add(newItemGroup);
+            newItemGroup.AddChild(newNode);
+            rootNode.AddChild(newItemGroup);
         }
     }
 
@@ -548,13 +547,13 @@ public struct Project : IDisposable, ISerializable
                 XMLNode itemNode = itemGroupNode.Children[i];
                 if (NameEquals(itemNode, itemName))
                 {
-                    itemGroupNode.RemoveAt(i, out _);
+                    itemGroupNode.RemoveChildAt(i);
                 }
             }
 
             if (itemGroupNode.Children.Length == 0)
             {
-                rootNode.TryRemove(itemGroupNode);
+                rootNode.TryRemoveChild(itemGroupNode);
             }
         }
     }
@@ -570,7 +569,7 @@ public struct Project : IDisposable, ISerializable
                 {
                     if (itemNode.TryGetAttribute(attributeName, out ReadOnlySpan<char> value) && value.SequenceEqual(attributeValue))
                     {
-                        itemGroupNode.RemoveAt(i, out _);
+                        itemGroupNode.RemoveChildAt(i);
                         return true;
                     }
                 }
@@ -578,7 +577,7 @@ public struct Project : IDisposable, ISerializable
 
             if (itemGroupNode.Children.Length == 0)
             {
-                rootNode.TryRemove(itemGroupNode);
+                rootNode.TryRemoveChild(itemGroupNode);
             }
         }
 
@@ -660,7 +659,7 @@ public struct Project : IDisposable, ISerializable
             if (value is bool nonNullValue)
             {
                 XMLNode propertyGroup = GetPropertyGroup(condition);
-                propertyGroup.Add(new XMLNode(propertyName, nonNullValue ? "True" : "False"));
+                propertyGroup.AddChild(new XMLNode(propertyName, nonNullValue ? "True" : "False"));
             }
         }
     }
@@ -696,7 +695,7 @@ public struct Project : IDisposable, ISerializable
             if (value is T nonNullValue)
             {
                 XMLNode propertyGroup = GetPropertyGroup(condition);
-                propertyGroup.Add(new XMLNode(propertyName, Enum.GetName(nonNullValue) ?? string.Empty));
+                propertyGroup.AddChild(new XMLNode(propertyName, Enum.GetName(nonNullValue) ?? string.Empty));
             }
         }
     }

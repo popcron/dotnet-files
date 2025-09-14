@@ -31,7 +31,7 @@ public readonly struct PackageReference
         {
             if (value is SemanticVersion version)
             {
-                node.SetAttribute(nameof(Version), version.ToString());
+                node.SetOrAddAttribute(nameof(Version), version.ToString());
             }
             else
             {
@@ -136,7 +136,7 @@ public readonly struct PackageReference
         {
             if (value is Assets notNullValue)
             {
-                node.SetAttribute(name, notNullValue.ToString().Replace(", ", ";"));
+                node.SetOrAddAttribute(name, notNullValue.ToString().Replace(", ", ";"));
             }
             else
             {
@@ -147,20 +147,17 @@ public readonly struct PackageReference
         {
             if (value is Assets notNullValue)
             {
-                if (!node.TryGetFirst(name, out XMLNode assetsChild))
+                if (!node.TryGetFirstChild(name, out XMLNode assetsChild))
                 {
                     assetsChild = new XMLNode(name.ToString());
-                    node.Add(assetsChild);
+                    node.AddChild(assetsChild);
                 }
 
                 assetsChild.Content.CopyFrom(notNullValue.ToString().Replace(", ", ";"));
             }
             else
             {
-                if (node.TryGetFirst(name, out XMLNode assetsChild))
-                {
-                    node.TryRemove(assetsChild);
-                }
+                node.TryRemoveChild(name);
             }
         }
     }

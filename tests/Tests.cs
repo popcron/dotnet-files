@@ -117,6 +117,7 @@ public class Tests
         using Project project = byteReader.ReadObject<Project>();
         string debugCondition = "'$(Configuration)|$(Platform)'=='Debug|AnyCPU'";
         string releaseCondition = "'$(Configuration)|$(Platform)'=='Release|AnyCPU'";
+
         Assert.That(project.Sdk, Is.EqualTo(Sdk.MicrosoftNETSdk));
         Assert.That(project.LangVersion, Is.Null);
         Assert.That(project.TargetFrameworks.Length, Is.EqualTo(3));
@@ -141,6 +142,7 @@ public class Tests
         string projectText = Samples.Get("Samples/Project.Tests.csproj.txt");
         using ByteReader byteReader = ByteReader.CreateFromUTF8(projectText);
         using Project project = byteReader.ReadObject<Project>();
+
         Assert.That(project.Sdk, Is.EqualTo(Sdk.MicrosoftNETSdk));
         Assert.That(project.TargetFrameworks.Length, Is.EqualTo(1));
         Assert.That(project.TargetFrameworks[0], Is.EqualTo(TargetFramework.Net10));
@@ -153,5 +155,37 @@ public class Tests
         Assert.That(project.IsTrimmable(), Is.Null);
         Assert.That(project.IsPackable(), Is.False);
         Assert.That(project.TreatWarningsAsErrors(), Is.Null);
+    }
+
+    [Test]
+    public void ListProjectsInSolution()
+    {
+        string solutionText = Samples.Get("Samples/Solution.slnx.txt");
+        using ByteReader byteReader = ByteReader.CreateFromUTF8(solutionText);
+        using Solution solution = byteReader.ReadObject<Solution>();
+        using List<SolutionProject> projects = new();
+        solution.GetProjects(projects);
+
+        Assert.That(projects.Count, Is.EqualTo(5));
+        Assert.That(projects[0].Path.ToString(), Is.EqualTo("../../clipboard/source/Clipboard.csproj"));
+        Assert.That(projects[1].Path.ToString(), Is.EqualTo("../../collections/source/Collections.csproj"));
+        Assert.That(projects[2].Path.ToString(), Is.EqualTo("../../unmanaged/core/Unmanaged.Core.csproj"));
+        Assert.That(projects[3].Path.ToString(), Is.EqualTo("../../xml/source/XML.csproj"));
+        Assert.That(projects[4].Path.ToString(), Is.EqualTo("Project.csproj"));
+
+        solution.ClearProjects();
+
+        projects.Clear();
+        solution.GetProjects(projects);
+        Assert.That(projects.Count, Is.EqualTo(0));
+
+        solution.AddProject("NewProject1.csproj");
+
+        Assert.That(solution.ContainsProject("NewProject1.csproj"), Is.True);
+
+        projects.Clear();
+        solution.GetProjects(projects);
+        Assert.That(projects.Count, Is.EqualTo(1));
+        Assert.That(projects[0].Path.ToString(), Is.EqualTo("NewProject1.csproj"));
     }
 }

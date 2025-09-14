@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Solution.slnx.txt" />
     <EmbeddedResource Include="Samples\Unmanaged.Tests.New.csproj.txt" />
     <EmbeddedResource Include="Samples\Unmanaged.Tests.Old.csproj.txt" />
     <EmbeddedResource Include="Samples\Project.Tests.csproj.txt" />

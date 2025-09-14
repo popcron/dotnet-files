@@ -1,0 +1,7 @@
+﻿<Solution>
+  <Project Path="../../clipboard/source/Clipboard.csproj" />
+  <Project Path="../../collections/source/Collections.csproj" />
+  <Project Path="../../unmanaged/core/Unmanaged.Core.csproj" />
+  <Project Path="../../xml/source/XML.csproj" />
+  <Project Path="Project.csproj" />
+</Solution>
